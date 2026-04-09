@@ -17,7 +17,9 @@ int main()
 	
 	const char* command_list[]={"help - commands information","conn - connect to","inf-cs - information about current session","clear - clear screen","exit - exit from program", "inp - show base information","sreq - stun request"};
 	
-	bool keep_udp_conn;
+	bool is_keep_udp_conn=true;
+	bool is_keep_udp_hole;
+
 	if (gpb_ip(sock,&ip,&port)==0)
 	{
 		for (unsigned short i=0;i<sizeof(command_list)/8;i++){for (int j=0;j<command_list[i][j]!='\0';j++){std::cout<<command_list[i][j];};std::cout<<'\n';}
@@ -47,7 +49,26 @@ int main()
 					addr.sin_addr.s_addr=INADDR_ANY;
 
 					bind(sock,(struct sockaddr*)&addr,sizeof(addr));
-					udp_conn(i_ip.c_str(),std::stoi(i_p),sock);
+					
+					struct sockaddr_in faddr;
+					faddr.sin_family=AF_INET;
+					faddr.sin_port=htons(std::stoi(i_p));
+
+					inet_pton(AF_INET,i_ip.c_str(),&faddr.sin_addr);
+
+					if (udp_conn(sock,faddr)==0)
+					{
+						std::cout<<"Enter udpclose for exit\n";
+						if (is_keep_udp_conn==true){std::thread(keep_udp_conn,sock,faddr).detach();}
+						std::thread(udp_read,sock,faddr).detach();
+						while (1)
+						{
+							std::string ccmd;
+							while (ccmd.empty()){std::cout<<ip<<'>';getline(std::cin,ccmd);}
+							if (cmd=="udpclose"){close(sock);break;}
+							sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&addr,sizeof(addr));
+						}
+					}
 				}
 				catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;}
 			}

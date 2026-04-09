@@ -1,0 +1,59 @@
+#include <iostream>
+#include <network.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <thread>
+#include <chrono>
+
+void udp_listen_conn(int sock,struct sockaddr_in addr,bool *is_conn)
+{
+	socklen_t ips=sizeof(addr);
+	while (1)
+	{
+		unsigned short chkc;
+		int sb=recvfrom(sock,&chkc,sizeof(chkc),0,(struct sockaddr*)&addr,&ips);
+		if (chkc==0xbe3b){*is_conn=true;std::cout<<"connected\n";return;}
+	}
+}
+
+void keep_udp_conn(int sock,struct sockaddr_in addr)
+{
+	unsigned short mka=0x3a1c;
+	while (1){sendto(sock,&mka,sizeof(mka),0,(struct sockaddr*)&addr,sizeof(addr));std::this_thread::sleep_for(std::chrono::seconds(3));}
+}
+
+void udp_read(int sock,struct sockaddr_in addr)
+{
+	unsigned char buffer[2048];
+	socklen_t ips=sizeof(addr);
+	try
+	{
+		while (1)
+		{
+			int sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&addr,&ips);
+			if (sb<0){return;}
+			else
+			{
+				if (*(uint16_t*)buffer==0x3a1c){continue;}
+				buffer[sb]='\0';
+				for (int i=0;i<sb;i++){std::cout<<buffer[i];}
+			}
+		}
+	}
+	catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;return;}
+}
+
+int udp_conn(int sock,struct sockaddr_in addr)
+{
+	bool is_conn=false;
+	std::thread(udp_listen_conn,sock,addr,&is_conn).detach();
+	unsigned short mgn_c=0xbe3b;
+	while (1)
+	{
+		sendto(sock,&mgn_c,sizeof(mgn_c),0,(struct sockaddr*)&addr,sizeof(addr));
+		if (is_conn==true){break;}
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+	}
+	return 0;
+}
