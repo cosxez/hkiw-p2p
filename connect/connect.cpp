@@ -8,12 +8,13 @@
 
 void udp_listen_conn(int sock,struct sockaddr_in addr,bool *is_conn)
 {
+	std::cout<<"connection...";
 	socklen_t ips=sizeof(addr);
 	while (1)
 	{
 		unsigned short chkc;
 		int sb=recvfrom(sock,&chkc,sizeof(chkc),0,(struct sockaddr*)&addr,&ips);
-		if (chkc==0xbe3b){*is_conn=true;std::cout<<"connected\n";return;}
+		if (chkc==0xbe3b){*is_conn=true;std::cout<<"\nconnected\n";return;}
 	}
 }
 

@@ -7,6 +7,7 @@ struct cnf
 	bool is_keep_udp_conn;
 	bool is_keep_udp_hole;
 	bool start_info;
+	bool auto_gpbip;
 };
 
-int cfgp(struct cnf conf);
+int cfgp(struct cnf *conf);
