@@ -26,18 +26,22 @@ void keep_udp_conn(int sock,struct sockaddr_in addr)
 void udp_read(int sock,struct sockaddr_in addr)
 {
 	unsigned char buffer[2048];
-	socklen_t ips=sizeof(addr);
+	struct sockaddr_in faddr;
+
+	socklen_t ips=sizeof(faddr);
 	try
 	{
 		while (1)
 		{
-			int sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&addr,&ips);
+			int sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&faddr,&ips);
 			if (sb<0){return;}
-			else
+			if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr)
 			{
 				if (*(uint16_t*)buffer==0x3a1c){continue;}
 				buffer[sb]='\0';
+				std::cout<<"\nnterlocutor>";
 				for (int i=0;i<sb;i++){std::cout<<buffer[i];}
+				std::cout<<"\nyou>"<<std::flush;
 			}
 		}
 	}

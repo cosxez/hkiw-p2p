@@ -64,9 +64,9 @@ int main()
 						while (1)
 						{
 							std::string ccmd;
-							while (ccmd.empty()){std::cout<<ip<<'>';getline(std::cin,ccmd);}
-							if (cmd=="udpclose"){close(sock);break;}
-							sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&addr,sizeof(addr));
+							while (ccmd.empty()){std::cout<<"you>";getline(std::cin,ccmd);}
+							if (ccmd=="udpclose"){close(sock);break;}
+							sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
 						}
 					}
 				}
