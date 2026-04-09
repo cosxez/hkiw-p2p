@@ -20,7 +20,7 @@ void udp_listen_conn(int sock,struct sockaddr_in addr,bool *is_conn)
 void keep_udp_conn(int sock,struct sockaddr_in addr)
 {
 	unsigned short mka=0x3a1c;
-	while (1){sendto(sock,&mka,sizeof(mka),0,(struct sockaddr*)&addr,sizeof(addr));std::this_thread::sleep_for(std::chrono::seconds(3));}
+	while (1){sendto(sock,&mka,sizeof(mka),0,(struct sockaddr*)&addr,sizeof(addr));std::this_thread::sleep_for(std::chrono::seconds(30));}
 }
 
 void udp_read(int sock,struct sockaddr_in addr)
@@ -41,7 +41,7 @@ void udp_read(int sock,struct sockaddr_in addr)
 				buffer[sb]='\0';
 				std::cout<<"\nnterlocutor>";
 				for (int i=0;i<sb;i++){std::cout<<buffer[i];}
-				std::cout<<"\nyou>"<<std::flush;
+				std::cout<<"\n(you can countinue writing, message will not change)you>"<<std::flush;
 			}
 		}
 	}
