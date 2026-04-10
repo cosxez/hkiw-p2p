@@ -8,7 +8,6 @@
 
 void udp_listen_conn(int sock,struct sockaddr_in addr,bool *is_conn)
 {
-	std::cout<<"connection...";
 	socklen_t ips=sizeof(addr);
 	while (1)
 	{
@@ -30,30 +29,35 @@ void udp_read(int sock,struct sockaddr_in addr)
 	struct sockaddr_in faddr;
 
 	socklen_t ips=sizeof(faddr);
-	try
+
+	bool warn=false;
+	while (1)
 	{
-		while (1)
+		try
 		{
 			int sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&faddr,&ips);
-			if (sb<0){return;}
+			if (sb<0){std::cout<<"connection broke or interlocutor disconnected\n";close(sock);sock=-1;return;}
 			if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr)
 			{
 				if (*(uint16_t*)buffer==0x3a1c){continue;}
 				buffer[sb]='\0';
-				std::cout<<"\nnterlocutor>";
+				std::cout<<"\ninterlocutor>";
 				for (int i=0;i<sb;i++){std::cout<<buffer[i];}
-				std::cout<<"\n(you can countinue writing, message will not change)you>"<<std::flush;
+				if (warn==false){std::cout<<"\n(you can countinue writing)you>"<<std::flush;warn=true;}
+				else{std::cout<<"\nyou>"<<std::flush;}
 			}
 		}
+		catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;}
 	}
-	catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;return;}
 }
+
 
 int udp_conn(int sock,struct sockaddr_in addr)
 {
 	bool is_conn=false;
 	std::thread(udp_listen_conn,sock,addr,&is_conn).detach();
 	unsigned short mgn_c=0xbe3b;
+	std::cout<<"connection..."<<std::flush;
 	while (1)
 	{
 		sendto(sock,&mgn_c,sizeof(mgn_c),0,(struct sockaddr*)&addr,sizeof(addr));

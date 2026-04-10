@@ -73,17 +73,19 @@ int main()
 					std::thread(udp_read,sock,faddr).detach();
 					while (1)
 					{
+						if (sock==-1){break;}
 						std::string ccmd;
 						while (ccmd.empty()){std::cout<<"you>";getline(std::cin,ccmd);}
-						if (ccmd=="udpclose"){close(sock);break;}
-						sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
+						if (ccmd=="udpclose"){close(sock);sock=-1;break;}
+						int sb=sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
+						if (sb<0){close(sock);sock=-1;break;}
 					}
 				}
 			}
 			catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;}
 		}
 	}
-	close(sock);
+	if (sock!=-1){close(sock);}
 
 	return 0;
 }
