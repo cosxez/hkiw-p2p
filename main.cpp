@@ -85,7 +85,7 @@ int main()
 					}
 				}
 				if (sock!=-1){close(sock);sock=-1;}
-				std::cout<<"disconneted, socket closed\n";
+				std::cout<<"\ndisconneted, socket closed\n";
 			}
 			catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;}
 		}
