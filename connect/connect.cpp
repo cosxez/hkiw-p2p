@@ -9,11 +9,12 @@
 void udp_listen_conn(int sock,struct sockaddr_in addr,bool *is_conn)
 {
 	socklen_t ips=sizeof(addr);
+	unsigned char dump[512];
 	while (1)
 	{
 		unsigned short chkc;
-		int sb=recvfrom(sock,&chkc,sizeof(chkc),0,(struct sockaddr*)&addr,&ips);
-		if (chkc==0xbe3b){*is_conn=true;std::cout<<"\nconnected\n";return;}
+		ssize_t sb=recvfrom(sock,&chkc,sizeof(chkc),0,(struct sockaddr*)&addr,&ips);
+		if (chkc==0xbe3b){*is_conn=true;std::cout<<"\nconnected\n";break;recvfrom(sock,dump,sizeof(dump),0,(struct sockaddr*)&addr,&ips);return;}
 	}
 }
 
@@ -71,7 +72,7 @@ int udp_conn(int sock,struct sockaddr_in addr)
 	{
 		sendto(sock,&mgn_c,sizeof(mgn_c),0,(struct sockaddr*)&addr,sizeof(addr));
 		if (is_conn==true){break;}
-		std::this_thread::sleep_for(std::chrono::seconds(4));
+		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 	return 0;
 }
