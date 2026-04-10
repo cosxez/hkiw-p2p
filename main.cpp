@@ -5,6 +5,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <fstream>
+#include <vector>
 #include <cstring>
 #include <thread>
 #include <chrono>
@@ -77,7 +79,50 @@ int main()
 					{
 						std::string ccmd;
 						while (ccmd.empty()){std::cout<<"you>";getline(std::cin,ccmd);}	
-						if (ccmd=="udpclose"){close(sock);sock=-1;break;}
+						if (ccmd=="/udpclose"){close(sock);sock=-1;break;}
+						if (ccmd.size()>10 && ccmd[0]=='/')
+						{
+							std::string str="";
+							for (int i=0;i<10;i++){str+=ccmd[i];}
+							if (str=="/send-file")
+							{
+								str="";
+								for (int i=12;i<ccmd.size();i++){str+=ccmd[i];}
+								
+								std::ifstream file(str,std::ios::binary);
+								if (file.is_open())
+								{
+									file.seekg(0,std::ios::end);
+									size_t fs=file.tellg();
+									file.seekg(0,std::ios::beg);
+
+									std::vector<unsigned char> fd(fs);
+									file.read(reinterpret_cast<char*>(fd.data()),fs);
+									file.close();
+
+									unsigned short mff=0x3bad;
+									sendto(sock,&mff,2,0,(struct sockaddr*)&faddr,sizeof(faddr));
+									sendto(sock,&fs,sizeof(fs),0,(struct sockaddr*)&faddr,sizeof(faddr));
+									sendto(sock,str.c_str(),str.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
+
+									unsigned int cpc=0;
+									while (cpc<fs)
+									{
+										if ((cpc+32768)<fd.size())
+										{
+											sendto(sock,&fd[cpc],32768,0,(struct sockaddr*)&faddr,sizeof(faddr));
+											cpc+=32768;
+										}
+										else
+										{
+											int ost=fd.size()-cpc;
+											sendto(sock,&fd[cpc+ost],cpc+ost,0,(struct sockaddr*)&faddr,sizeof(faddr));
+											cpc+=ost;
+										}
+									}
+								}
+							}
+						}
 
 						if (sock==-1){break;}
 

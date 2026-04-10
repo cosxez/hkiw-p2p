@@ -3,6 +3,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <fstream>
+#include <vector>
 #include <thread>
 #include <chrono>
 
@@ -48,10 +50,34 @@ void udp_read(int sock,struct sockaddr_in addr)
 				if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr && sock!=-1)
 				{
 					if (*(uint16_t*)buffer==0xbe3b || *(uint16_t*)buffer==0x3a1c){continue;}
+					if (*(uint16_t*)buffer==0x3bad)
+					{
+						size_t fs;
+						recvfrom(sock,&fs,sizeof(fs),0,(struct sockaddr*)&faddr,&ips);
+
+						sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&faddr,&ips);
+						std::string str;
+						for (int i=0;i<sb;i++){str+=buffer[i];}
+
+						std::vector<unsigned char> fd(fs);
+						unsigned int cpc=0;
+						while (cpc<fs)
+						{
+							cpc+=recvfrom(sock,fd.data()+cpc,fs,0,(struct sockaddr*)&faddr,&ips);
+						}
+
+						std::ofstream file(str,std::ios::binary);
+						if (file.is_open())
+						{
+							file.write(reinterpret_cast<const char*>(fd.data()),fs);
+							file.close();
+						}
+						continue;
+					}
 					buffer[sb]='\0';
 					std::cout<<"\ninterlocutor>";
 					for (int i=0;i<sb;i++){std::cout<<buffer[i];}
-					if (warn==false){std::cout<<"\n(you can countinue writing)\nyou>"<<std::flush;warn=true;}
+					if (warn==false){std::cout<<"\n(you can also continue writing)\nyou>"<<std::flush;warn=true;}
 					else{std::cout<<"\nyou>"<<std::flush;}
 				}
 			}
