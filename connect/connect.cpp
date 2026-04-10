@@ -46,9 +46,9 @@ void udp_read(int sock,struct sockaddr_in addr)
 			if (sb<=0){std::cout<<"connection broke or interlocutor disconnected\n";close(sock);sock=-1;return;}
 			else
 			{
-				if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr)
+				if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr && sock!=-1)
 				{
-					if (*(uint16_t*)buffer==0x3a1c){continue;}
+					if (*(uint16_t*)buffer==0x3a1c){recvfrom(sock,buffer,sizeof(buffer),0,(struct sockaddr*)&addr,&ips);continue;}
 					buffer[sb]='\0';
 					std::cout<<"\ninterlocutor>";
 					for (int i=0;i<sb;i++){std::cout<<buffer[i];}
