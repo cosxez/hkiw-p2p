@@ -81,17 +81,17 @@ int main()
 
 						if (sock==-1){break;}
 
-						int sb=sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
-						if (sb<=0){close(sock);sock=-1;break;}
+						if (sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr))<=0){close(sock);sock=-1;break;}
 					}
 				}
+				if (sock!=-1){close(sock);sock=-1;}
 				std::cout<<"disconneted, socket closed\n";
-				if (sock!=-1){close(sock);}
 			}
 			catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;}
 		}
 	}
 	if (sock!=-1){close(sock);}
+	std::cout<<"Bye\n";
 
 	return 0;
 }
