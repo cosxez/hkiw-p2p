@@ -47,7 +47,7 @@ void udp_read(int sock,struct sockaddr_in addr)
 			{
 				if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr && sock!=-1)
 				{
-					if (*(uint16_t*)buffer==0x3a1c){continue;}
+					if (*(uinet16_t*)buffer==0xbe3b || *(uint16_t*)buffer==0x3a1c){continue;}
 					buffer[sb]='\0';
 					std::cout<<"\ninterlocutor>";
 					for (int i=0;i<sb;i++){std::cout<<buffer[i];}
