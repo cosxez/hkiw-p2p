@@ -35,16 +35,19 @@ void udp_read(int sock,struct sockaddr_in addr)
 	{
 		try
 		{
-			int sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&faddr,&ips);
-			if (sb<0){std::cout<<"connection broke or interlocutor disconnected\n";close(sock);sock=-1;return;}
-			if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr)
+			ssize_t sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&faddr,&ips);
+			if (sb<=0){std::cout<<"connection broke or interlocutor disconnected\n";close(sock);sock=-1;return;}
+			else
 			{
-				if (*(uint16_t*)buffer==0x3a1c){continue;}
-				buffer[sb]='\0';
-				std::cout<<"\ninterlocutor>";
-				for (int i=0;i<sb;i++){std::cout<<buffer[i];}
-				if (warn==false){std::cout<<"\n(you can countinue writing)you>"<<std::flush;warn=true;}
-				else{std::cout<<"\nyou>"<<std::flush;}
+				if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr)
+				{
+					if (*(uint16_t*)buffer==0x3a1c){continue;}
+					buffer[sb]='\0';
+					std::cout<<"\ninterlocutor>";
+					for (int i=0;i<sb;i++){std::cout<<buffer[i];}
+					if (warn==false){std::cout<<"\n(you can countinue writing)\nyou>"<<std::flush;warn=true;}
+					else{std::cout<<"\nyou>"<<std::flush;}
+				}
 			}
 		}
 		catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;}

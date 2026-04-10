@@ -39,9 +39,11 @@ int main()
 		if (cmd=="exit"){break;}
 		if (cmd=="inf-cs"){std::string restr="Keep alive udp connection is ";restr+=(conf.is_keep_udp_conn ? "true" : "false"); restr+="\nKeep alive udp hole is ";restr+=(conf.is_keep_udp_hole ? "true" : "false");restr+="\nAuto get public ip and port is ";restr+=(conf.auto_gpbip ? "true":"false");restr+='\n';std::cout<<restr;}
 		if (cmd=="inp"){for (unsigned short i=0;i<sizeof(command_list)/8;i++){for (int j=0;j<command_list[i][j]!='\0';j++){std::cout<<command_list[i][j];};std::cout<<'\n';};std::cout<<"your public ip and port: "<<ip<<' '<<port<<'\n';}
-		if (cmd=="sreq"){ip="";port=0;gpb_ip(sock,&ip,&port);std::cout<<"your public ip and port: "<<ip<<' '<<port<<'\n';}
+		if (cmd=="sreq"){if (sock==-1){sock=socket(AF_INET,SOCK_DGRAM,0);};ip="";port=0;gpb_ip(sock,&ip,&port);std::cout<<"your public ip and port: "<<ip<<' '<<port<<'\n';}
 		if (cmd=="conn")
 		{
+			if (sock==-1){sock=socket(AF_INET,SOCK_DGRAM,0);ip="";port=0;if (gpb_ip(sock,&ip,&port)==0){std::cout<<"your public ip and port: "<<ip<<' '<<port<<'\n';}}
+
 			if (conf.auto_gpbip==false){if (gpb_ip(sock,&ip,&port)==0){std::cout<<"your public ip and port: "<<ip<<' '<<port<<std::endl;}}
 			
 			std::cout<<"Enter interlocutor ip: ";
@@ -73,14 +75,18 @@ int main()
 					std::thread(udp_read,sock,faddr).detach();
 					while (1)
 					{
-						if (sock==-1){break;}
 						std::string ccmd;
-						while (ccmd.empty()){std::cout<<"you>";getline(std::cin,ccmd);}
+						while (ccmd.empty()){std::cout<<"you>";getline(std::cin,ccmd);}	
 						if (ccmd=="udpclose"){close(sock);sock=-1;break;}
+
+						if (sock==-1){break;}
+
 						int sb=sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
-						if (sb<0){close(sock);sock=-1;break;}
+						if (sb<=0){close(sock);sock=-1;break;}
 					}
 				}
+				std::cout<<"disconneted, socket closed\n";
+				if (sock!=-1){close(sock);}
 			}
 			catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;}
 		}
