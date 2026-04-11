@@ -71,7 +71,7 @@ void udp_read(int sock,struct sockaddr_in addr)
 						{
 							file.write(reinterpret_cast<const char*>(fd.data()),fs);
 							file.close();
-							std::cout<<"\nfile wrote\n>"<<std::flush;
+							std::cout<<"\nfile wrote \"" +str +"\"\n>"<<std::flush;
 						}
 						else{std::cout<<"\nerror: file dont open\n>"<<std::flush;}
 						continue;
