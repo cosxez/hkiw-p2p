@@ -24,7 +24,7 @@ void keep_udp_conn(int sock,struct sockaddr_in addr)
 	unsigned short mka=0x3a1c;
 	while (1)
 	{
-		if (sendto(sock,&mka,sizeof(mka),0,(struct sockaddr*)&addr,sizeof(addr))<=0){std::cout<<"\nconnection broke\n";if (sock!=-1){close(sock);sock=-1;return;}}
+		if (sendto(sock,&mka,sizeof(mka),0,(struct sockaddr*)&addr,sizeof(addr))<=0){std::cout<<"\nconnection broke\n>"<<std::flush;if (sock!=-1){close(sock);sock=-1;return;}}
 		std::this_thread::sleep_for(std::chrono::seconds(30));
 	}
 }
@@ -42,9 +42,9 @@ void udp_read(int sock,struct sockaddr_in addr)
 		try
 		{
 			ssize_t sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&faddr,&ips);
-			if (sock==-1){std::cout<<"\nconnection closed\n";return;}
+			if (sock==-1){std::cout<<"\nconnection closed\n>"<<std::flush;return;}
 
-			if (sb<=0){std::cout<<"\nconnection broke or interlocutor disconnected\n";close(sock);sock=-1;return;}
+			if (sb<=0){std::cout<<"\nconnection broke or interlocutor disconnected\n>"<<std::flush;close(sock);sock=-1;return;}
 			else
 			{
 				if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr && sock!=-1)
@@ -97,7 +97,7 @@ int udp_conn(int sock,struct sockaddr_in addr)
 	{
 		sendto(sock,&mgn_c,sizeof(mgn_c),0,(struct sockaddr*)&addr,sizeof(addr));
 		if (is_conn==true){break;}
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 	return 0;
 }

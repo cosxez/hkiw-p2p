@@ -72,13 +72,16 @@ int main()
 
 				if (udp_conn(sock,faddr)==0)
 				{
-					std::cout<<"Enter udpclose for exit\n";
+					std::cout<<"Enter /udpclose for exit\n";
 					if (conf.is_keep_udp_conn==true){std::thread(keep_udp_conn,sock,faddr).detach();}
 					std::thread(udp_read,sock,faddr).detach();
 					while (1)
 					{
 						std::string ccmd;
-						while (ccmd.empty()){std::cout<<"you>";getline(std::cin,ccmd);}	
+						while (ccmd.empty()){std::cout<<"you>";getline(std::cin,ccmd);}
+						
+						if (sock==-1){break;}
+
 						if (ccmd=="/udpclose"){close(sock);sock=-1;break;}
 						if (ccmd.size()>10 && ccmd[0]=='/')
 						{
@@ -87,8 +90,7 @@ int main()
 							if (str=="/send-file")
 							{
 								str="";
-								for (int i=12;i<ccmd.size();i++){str+=ccmd[i];}
-								
+								for (int i=11;i<ccmd.size();i++){str+=ccmd[i];}
 								std::ifstream file(str,std::ios::binary);
 								if (file.is_open())
 								{
@@ -105,7 +107,8 @@ int main()
 									sendto(sock,&fs,sizeof(fs),0,(struct sockaddr*)&faddr,sizeof(faddr));
 									sendto(sock,str.c_str(),str.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
 
-									unsigned int cpc=0;
+									sendto(sock,fd.data(),fs,0,(struct sockaddr*)&faddr,sizeof(faddr));
+									/*unsigned int cpc=0;
 									while (cpc<fs)
 									{
 										if ((cpc+32768)<fd.size())
@@ -119,18 +122,16 @@ int main()
 											sendto(sock,&fd[cpc+ost],cpc+ost,0,(struct sockaddr*)&faddr,sizeof(faddr));
 											cpc+=ost;
 										}
-									}
+									}*/
 								}
 							}
 						}
 
-						if (sock==-1){break;}
-
-						if (sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr))<=0){close(sock);sock=-1;break;}
+						else{if (sendto(sock,ccmd.c_str(),ccmd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr))<=0){close(sock);sock=-1;break;}}
 					}
 				}
 				if (sock!=-1){close(sock);sock=-1;}
-				std::cout<<"\ndisconneted, socket closed\n";
+				std::cout<<"\ndisconneted, socket closed\n"<<std::flush;
 			}
 			catch(std::exception &e){std::cout<<"Error: "<<e.what()<<std::endl;}
 		}
