@@ -110,10 +110,10 @@ int main()
 									size_t cpc=0;
 									while (cpc<fs)
 									{
-										if ((cpc+32768)<fd.size())
+										if ((cpc+1280)<fd.size())
 										{
-											sendto(sock,&fd[cpc],32768,0,(struct sockaddr*)&faddr,sizeof(faddr));
-											cpc+=32768;
+											sendto(sock,&fd[cpc],1280,0,(struct sockaddr*)&faddr,sizeof(faddr));
+											cpc+=1280;
 										}
 										else
 										{
@@ -123,6 +123,7 @@ int main()
 										std::cout<<cpc<<' '<<fs<<std::endl;
 									}
 								}
+								else{std::cout<<"error: file dont exist\n";}
 							}
 						}
 

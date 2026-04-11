@@ -74,7 +74,7 @@ void udp_read(int sock,struct sockaddr_in addr)
 							file.close();
 							std::cout<<"file wrote\n";
 						}
-						else{std::cout<<"error\n";}
+						else{std::cout<<"error: file dont open\n";}
 						continue;
 					}
 					buffer[sb]='\0';
