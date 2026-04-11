@@ -91,6 +91,44 @@ void udp_read(int sock,struct sockaddr_in addr)
 	}
 }
 
+int send_file(int sock,struct sockaddr_in addr,std::string str)
+{
+	std::ifstream file(str,std::ios::binary);
+	if (file.is_open())
+	{
+		file.seekg(0,std::ios::end);
+		size_t fs=file.tellg();
+		file.seekg(0,std::ios::beg);
+
+		std::vector<unsigned char> fd(fs);
+		file.read(reinterpret_cast<char*>(fd.data()),fs);
+		file.close();
+
+		unsigned short mff=0x3bad;
+		sendto(sock,&mff,2,0,(struct sockaddr*)&addr,sizeof(addr));
+		sendto(sock,&fs,sizeof(fs),0,(struct sockaddr*)&addr,sizeof(addr));
+		sendto(sock,str.c_str(),str.size(),0,(struct sockaddr*)&addr,sizeof(addr));
+
+		size_t cpc=0;
+		while (cpc<fs)
+		{
+			if ((cpc+1024)<fd.size())
+			{
+				sendto(sock,&fd[cpc],1024,0,(struct sockaddr*)&addr,sizeof(addr));
+				cpc+=1024;
+			}
+			else
+			{
+				sendto(sock,&fd[cpc],fd.size()-cpc,0,(struct sockaddr*)&addr,sizeof(addr));
+				cpc+=fd.size()-cpc;
+			}
+		}
+		std::cout<<"\nfile sended\n>"<<std::flush;
+	}
+	else{std::cout<<"\nerror: file dont exist\n>"<<std::flush;return 1;}
+	
+	return 0;
+}
 
 int udp_conn(int sock,struct sockaddr_in addr)
 {

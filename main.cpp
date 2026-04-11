@@ -91,38 +91,7 @@ int main()
 							{
 								str="";
 								for (int i=11;i<ccmd.size();i++){str+=ccmd[i];}
-								std::ifstream file(str,std::ios::binary);
-								if (file.is_open())
-								{
-									file.seekg(0,std::ios::end);
-									size_t fs=file.tellg();
-									file.seekg(0,std::ios::beg);
-
-									std::vector<unsigned char> fd(fs);
-									file.read(reinterpret_cast<char*>(fd.data()),fs);
-									file.close();
-
-									unsigned short mff=0x3bad;
-									sendto(sock,&mff,2,0,(struct sockaddr*)&faddr,sizeof(faddr));
-									sendto(sock,&fs,sizeof(fs),0,(struct sockaddr*)&faddr,sizeof(faddr));
-									sendto(sock,str.c_str(),str.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
-
-									size_t cpc=0;
-									while (cpc<fs)
-									{
-										if ((cpc+1024)<fd.size())
-										{
-											sendto(sock,&fd[cpc],1024,0,(struct sockaddr*)&faddr,sizeof(faddr));
-											cpc+=1024;
-										}
-										else
-										{
-											sendto(sock,&fd[cpc],fd.size()-cpc,0,(struct sockaddr*)&faddr,sizeof(faddr));
-											cpc+=fd.size()-cpc;
-										}
-									}
-								}
-								else{std::cout<<"\nerror: file dont exist\n>"<<std::flush;}
+								send_file(sock,faddr,str);
 							}
 						}
 
