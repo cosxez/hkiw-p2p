@@ -110,10 +110,10 @@ int main()
 									size_t cpc=0;
 									while (cpc<fs)
 									{
-										if ((cpc+1280)<fd.size())
+										if ((cpc+1024)<fd.size())
 										{
-											sendto(sock,&fd[cpc],1280,0,(struct sockaddr*)&faddr,sizeof(faddr));
-											cpc+=1280;
+											sendto(sock,&fd[cpc],1024,0,(struct sockaddr*)&faddr,sizeof(faddr));
+											cpc+=1024;
 										}
 										else
 										{
