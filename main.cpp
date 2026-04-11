@@ -117,13 +117,12 @@ int main()
 										}
 										else
 										{
-											sendto(sock,&fd[cpc],fd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
+											sendto(sock,&fd[cpc],fd.size()-cpc,0,(struct sockaddr*)&faddr,sizeof(faddr));
 											cpc+=fd.size()-cpc;
 										}
-										std::cout<<cpc<<' '<<fs<<std::endl;
 									}
 								}
-								else{std::cout<<"error: file dont exist\n";}
+								else{std::cout<<"\nerror: file dont exist\n>"<<std::flush;}
 							}
 						}
 
