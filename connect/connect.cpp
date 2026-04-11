@@ -64,9 +64,12 @@ void udp_read(int sock,struct sockaddr_in addr)
 
 						std::vector<unsigned char> fd(fs);
 						unsigned int cpc=0;
+						unsigned int lsr;
 						while (cpc<fs)
 						{
-							cpc+=recvfrom(sock,fd.data()+cpc,fd.size(),0,(struct sockaddr*)&faddr,&ips);
+							lsr=recvfrom(sock,fd.data()+cpc,fd.size(),0,(struct sockaddr*)&faddr,&ips);
+							if (lsr==2 && *(uint16_t*)(fd.data() + cpc)==0xe3dd){fd.erase(fd.begin()+cpc,fd.begin()+cpc+2);break;}
+							cpc+=lsr;
 						}
 
 						std::ofstream file(str,std::ios::binary);
@@ -123,6 +126,8 @@ int send_file(int sock,struct sockaddr_in addr,std::string str)
 				cpc+=fd.size()-cpc;
 			}
 		}
+		unsigned short mgcn=0xe3dd;
+		sendto(sock,&mgcn,2,0,(struct sockaddr*)&addr,sizeof(addr));
 		std::cout<<"\nfile sended\n>"<<std::flush;
 	}
 	else{std::cout<<"\nerror: file dont exist\n>"<<std::flush;return 1;}
