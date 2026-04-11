@@ -57,8 +57,10 @@ void udp_read(int sock,struct sockaddr_in addr)
 						
 						sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&faddr,&ips);
 						std::string str;
-						for (int i=0;i<sb;i++){str+=buffer[i];}
-						
+						for (int i=0;i<sb;i++){if ((i+2)<sb && buffer[i]=='.' && buffer[i+1]=='.' && buffer[i+2]=='/'){i+=3;continue;};str+=buffer[i];}
+						if (!str.empty() && (str==".." || str=="../" || str[0]=='/')){str="file_from_p2p";}
+						if (access(str.c_str(),F_OK)==0){str=("ffp2p_"+str);}
+
 						std::vector<unsigned char> fd(fs);
 						unsigned int cpc=0;
 						while (cpc<fs)
