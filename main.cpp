@@ -107,8 +107,7 @@ int main()
 									sendto(sock,&fs,sizeof(fs),0,(struct sockaddr*)&faddr,sizeof(faddr));
 									sendto(sock,str.c_str(),str.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
 
-									sendto(sock,fd.data(),fs,0,(struct sockaddr*)&faddr,sizeof(faddr));
-									/*unsigned int cpc=0;
+									size_t cpc=0;
 									while (cpc<fs)
 									{
 										if ((cpc+32768)<fd.size())
@@ -118,11 +117,11 @@ int main()
 										}
 										else
 										{
-											int ost=fd.size()-cpc;
-											sendto(sock,&fd[cpc+ost],cpc+ost,0,(struct sockaddr*)&faddr,sizeof(faddr));
-											cpc+=ost;
+											sendto(sock,&fd[cpc],fd.size(),0,(struct sockaddr*)&faddr,sizeof(faddr));
+											cpc+=fd.size()-cpc;
 										}
-									}*/
+										std::cout<<cpc<<' '<<fs<<std::endl;
+									}
 								}
 							}
 						}

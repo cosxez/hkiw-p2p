@@ -54,16 +54,17 @@ void udp_read(int sock,struct sockaddr_in addr)
 					{
 						size_t fs;
 						recvfrom(sock,&fs,sizeof(fs),0,(struct sockaddr*)&faddr,&ips);
-
+						std::cout<<fs<<std::endl;
 						sb=recvfrom(sock,buffer,sizeof(buffer)-1,0,(struct sockaddr*)&faddr,&ips);
 						std::string str;
 						for (int i=0;i<sb;i++){str+=buffer[i];}
-
+						std::cout<<str<<std::endl;
 						std::vector<unsigned char> fd(fs);
 						unsigned int cpc=0;
 						while (cpc<fs)
 						{
-							cpc+=recvfrom(sock,fd.data()+cpc,fs,0,(struct sockaddr*)&faddr,&ips);
+							cpc+=recvfrom(sock,fd.data()+cpc,fd.size(),0,(struct sockaddr*)&faddr,&ips);
+							std::cout<<cpc<<' '<<fs<<std::endl;
 						}
 
 						std::ofstream file(str,std::ios::binary);
@@ -71,7 +72,9 @@ void udp_read(int sock,struct sockaddr_in addr)
 						{
 							file.write(reinterpret_cast<const char*>(fd.data()),fs);
 							file.close();
+							std::cout<<"file wrote\n";
 						}
+						else{std::cout<<"error\n";}
 						continue;
 					}
 					buffer[sb]='\0';
