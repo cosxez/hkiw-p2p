@@ -20,7 +20,7 @@ int gpb_ip(int sock,std::string *sipv4,unsigned short *cport)
 	hink.ai_addr=NULL;
 	hink.ai_next=NULL;
 
-	if (getaddrinfo("stun.sipnet.ru","3478",&hink,&res)!=0){std::cout<<"failed get public ip\n";return 1;}
+	if (getaddrinfo("stun.rtc.yandex.net","3478",&hink,&res)!=0){std::cout<<"failed get public ip\n";return 1;}
 
 	unsigned char req[20];memset(&req,0,20);
 	*(uint16_t*)(&req[0])=htons(0x0001);

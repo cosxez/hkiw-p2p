@@ -49,7 +49,6 @@ void udp_read(int sock,struct sockaddr_in addr)
 			{
 				if (faddr.sin_addr.s_addr==addr.sin_addr.s_addr && sock!=-1)
 				{
-					if (*(uint16_t*)buffer==0xbe3b || *(uint16_t*)buffer==0x3a1c){continue;}
 					if (*(uint16_t*)buffer==0x3bad)
 					{
 						size_t fs;
@@ -82,6 +81,8 @@ void udp_read(int sock,struct sockaddr_in addr)
 						else{std::cout<<"\nerror: file dont open\n>"<<std::flush;}
 						continue;
 					}
+					if (*(uint16_t*)buffer==0xbe3b || *(uint16_t*)buffer==0x3a1c || *(uint16_t*)buffer==0xe3dd){continue;}
+
 					buffer[sb]='\0';
 					std::cout<<"\ninterlocutor>";
 					for (int i=0;i<sb;i++){std::cout<<buffer[i];}
